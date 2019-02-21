@@ -55,6 +55,20 @@ var budgetController = (function () {
       return newItem;
     },
 
+    deleteItem: function (type, id) {
+      var ids, index;
+
+      ids = data.allItems[type].map(function (current) {
+        return current.id;
+      });
+
+      index = ids.indexOf(id);
+
+      if (index !== -1) {
+        data.allItems[type].splice(index, 1);
+      }
+    },
+
     calculateBudget: function () {
       // Calculate total income and expenses
       calculateTotal('exp');
@@ -136,6 +150,11 @@ var UIController = (function () {
       // Insert the HTML into the DOM
       document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
 
+    }, 
+    
+    deleteListItem: function (selectorID) {
+      var el = document.getElementById(selectorID);
+      el.parentNode.removeChild(el);
     },
 
     clearFields: function () {
@@ -197,7 +216,15 @@ var controller = (function (budgetCtrl, UICtrl) {
 
     // 3. Display the budget on the UI
     UICtrl.displayBudget(budget);
-  }
+  };
+
+  var updatePercentages = function () {
+    // 1. Calculate percentages
+
+    // 2. Read percentages from the budget controller
+
+    // 3. Update the UI with the new percentages
+  };
 
   var ctrlAddItem = function () {
     var input, newItem;
@@ -218,6 +245,9 @@ var controller = (function (budgetCtrl, UICtrl) {
       
       // 5. Calculate adn update the budget
       updateBudget();
+
+      // 6. Calculate and update percentages
+      updatePercentages();
     }
   };
 
@@ -228,13 +258,19 @@ var controller = (function (budgetCtrl, UICtrl) {
     if (itemID) {
       splitID = itemID.split('-');
       type = splitID[0];
-      ID = splitID[1];
+      ID = parseInt(splitID[1]);
 
       // 1. delete the item from the data structure
+      budgetCtrl.deleteItem(type, ID);
 
       // 2. delete the item from the UI
+      UICtrl.deleteListItem(itemID);
 
       // 3. update and show the new budget
+      updateBudget();
+
+      // 4. Calculate and update percentages
+      updatePercentages();
     }
   };
 
